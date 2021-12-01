@@ -35,7 +35,7 @@ const Home: NextPage = () => {
 
   const [walletConnected, setWalletConnected] = useState(false);
 
-  const hasWallet = useMemo(() => typeof window !== 'undefined' && !!window.solana, []);
+  const hasWallet = typeof window !== 'undefined' && !!window.solana;
   
   const connectWallet = useCallback(() => {
     if (!window.solana) return;
