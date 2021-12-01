@@ -2,7 +2,7 @@ import { styled } from '../stitches.config';
 import type { NextPage } from 'next'
 import Head from 'next/head'
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box } from '../components/Box'
 import { DarkThemeButton } from '../components/DarkThemeButton'
 import { Section } from '../components/Section';
@@ -14,6 +14,7 @@ import { Image } from '../components/Image'
 import { Container } from '../components/Container';
 import { Card } from '../components/Card';
 import { Link } from '../components/Link';
+import { TextField } from '../components/TextField';
 
 declare global {
   interface Window {
@@ -34,8 +35,8 @@ const Home: NextPage = () => {
 
   const [walletConnected, setWalletConnected] = useState(false);
 
-  const creator = "9doSyLpnDtAB4R1CVmKjwqUWP6oJ8huB1SSJksthYPS";
-
+  const hasWallet = useMemo(() => typeof window !== 'undefined' && !!window.solana, []);
+  
   const connectWallet = useCallback(() => {
     if (!window.solana) return;
 
@@ -45,6 +46,14 @@ const Home: NextPage = () => {
         setTokens(tokens);
       });
     });
+  }, []);
+
+  const handleSubmit = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      fetch(`/api/tokens?address=${e.currentTarget.value}`).then(res => res.json()).then(tokens => {
+        setTokens(tokens);
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -82,9 +91,22 @@ const Home: NextPage = () => {
           <Heading as="h1" size="4">
             Solana NFT Viewer
           </Heading>
-          <Text size="3">
+          {hasWallet ? (
+            <Text size="3">
               <a href="#connect" onClick={connectWallet} style={{color: "#0070f3" }}>Connect your phantom wallet</a> to bind your wallet address.
-          </Text>
+            </Text>
+          ) : (
+            <Container size="3" css={{ padding: "$1"}}>
+              <TextField
+                type="text"
+                size="2"
+                placeholder="Wallet Address"
+                autoComplete="off"
+                css={{ mb: '$3' }}
+                onKeyDown={handleSubmit}
+              />
+            </Container>
+          )}
         </Box>
 
         <Flex justify="center" align="center" wrap="wrap" css={{ maxWidth: "1200px" }}>
