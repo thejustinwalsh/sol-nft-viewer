@@ -31,7 +31,7 @@ const Home: NextPage = () => {
       image: string,
       external_url: string,
     }
-  }>>([]);
+  }> | null>(null);
 
   const [walletConnected, setWalletConnected] = useState(false);
 
@@ -91,26 +91,34 @@ const Home: NextPage = () => {
           <Heading as="h1" size="4">
             Solana NFT Viewer
           </Heading>
-          {hasWallet ? (
-            <Text size="3">
-              <a href="#connect" onClick={connectWallet} style={{color: "#0070f3" }}>Connect your phantom wallet</a> to bind your wallet address.
-            </Text>
-          ) : (
-            <Container size="3" css={{ padding: "$1"}}>
-              <TextField
-                type="text"
-                size="2"
-                placeholder="Wallet Address"
-                autoComplete="off"
-                css={{ mb: '$3' }}
-                onKeyDown={handleSubmit}
-              />
-            </Container>
-          )}
+            {hasWallet ? (
+              <Text size="3">
+                {walletConnected ?
+                  (
+                    <>{!tokens ? `Loading...` : `Found ${tokens.length} NFTs`}</>                
+                  ) : (
+                    <>
+                      <a href="#connect" onClick={connectWallet} style={{color: "#0070f3" }}>Connect your phantom wallet</a> to bind your wallet address.
+                    </>
+                  )
+                }
+              </Text>
+            ) : (
+              <Container size="4" css={{ padding: "$1"}}>
+                <TextField
+                  type="text"
+                  size="2"
+                  placeholder="Wallet Address"
+                  autoComplete="off"
+                  css={{ mb: '$3' }}
+                  onKeyDown={handleSubmit}
+                />
+              </Container>
+            )}
         </Box>
 
         <Flex justify="center" align="center" wrap="wrap" css={{ maxWidth: "1200px" }}>
-          {tokens.map(token => (
+          {tokens && tokens.map(token => (
             <Card variant="interactive" css={{ margin: "$4", padding: "$3" }} key={token.address}>
               <Text as="h3" size="2">{token.metadata.name}</Text>
               <Image src={token.metadata.image} alt={token.metadata.name} width={200} height={200} />
