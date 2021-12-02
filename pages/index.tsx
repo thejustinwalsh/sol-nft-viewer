@@ -34,9 +34,8 @@ const Home: NextPage = () => {
   }> | null>(null);
 
   const [walletConnected, setWalletConnected] = useState(false);
+  const [hasWallet, setHasWallet] = useState(false);
 
-  const hasWallet = typeof window !== 'undefined' && !!window.solana;
-  
   const connectWallet = useCallback(() => {
     if (!window.solana) return;
 
@@ -57,8 +56,9 @@ const Home: NextPage = () => {
   }, []);
 
   useEffect(() => {
+    setHasWallet(!!window.solana);
     if (!window.solana) return;
-
+    
     // Will either automatically connect to Phantom, or do nothing.
     window.solana.connect({ onlyIfTrusted: true }).then(({ publicKey }: { publicKey: Symbol}) => {
       setWalletConnected(true);
